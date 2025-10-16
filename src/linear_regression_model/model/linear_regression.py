@@ -1,5 +1,8 @@
 import numpy as np
 from enum import Enum
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 class LinearRegression:
@@ -19,6 +22,7 @@ class LinearRegression:
         self.epochs = epochs
         self.method = method
         self.tol = tol
+        self.loss_history = []
 
     def fit(self, X, y):
         # m training samples, n features
@@ -52,15 +56,15 @@ class LinearRegression:
             error = X @ w + b * np.ones((self.m, 1)) - y
             return float((error.T @ error) / (2 * self.m))
 
-        # the traning process using gradient descent
-        # to find the parameters that make the J min
-
         previous_loss = float("inf")
 
+        # the traning process using gradient descent
+        # to find the parameters that make the J min
         for i in range(self.epochs):
             # forward pass
             j = J(w=self.w, b=self.b)
-            print("-Loss function: ", j)
+            # print("-Loss function: ", j)
+            self.loss_history.append(j)
 
             # backward pass
             rate_of_change_J_w = dJ_over_dw(self.w, self.b)
@@ -89,6 +93,21 @@ class LinearRegression:
     def parameters(self):
         print("W: ", self.w)
         print("b: ", self.b)
+
+    def view_loss(self):
+        df = pd.DataFrame(
+            data={"Epoch": range(len(self.loss_history)), "Loss": self.loss_history}
+        )
+
+        plt.figure(figsize=(7, 5))
+        sns.lineplot(data=df, x="Epoch", y="Loss")
+
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss (J)")
+        plt.title("Loss vs Epoch")
+        plt.grid(True)
+
+        plt.show()
 
     def score(self, X, y):
         None
