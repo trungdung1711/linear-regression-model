@@ -47,12 +47,7 @@ class LogisticRegression:
             # capture the w and b for the model
             return 1 / (1 + np.exp(-(X @ w + b * np.ones((self.N, 1)))))
 
-        def L_i(y, p_hat):
-            # element-wise with y and p_hat
-            return -(y * np.log(p_hat) + (1 - y) * np.log(1 - p_hat))
-
         def L(y, p_hat):
-            # take the mean of L_i
             return -np.mean(
                 y * np.log(p_hat + 1e-15) + (1 - y) * np.log(1 - p_hat + 1e-15)
             )
@@ -126,11 +121,6 @@ class LogisticRegression:
 
     def score(self, X, y):
         None
-
-    # def J(self, w, b):
-    #     a = (self.X @ w + b * np.ones((self.m, 1)) - y).T
-    #     b = self.X @ w + b * np.ones((self.m, 1)) - y
-    #     return (1 / (2 * self.m)) * (a @ b)
 
     def info(self):
         print("- Training samples: ", self.m)

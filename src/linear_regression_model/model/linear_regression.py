@@ -33,6 +33,11 @@ class LinearRegression:
         # (m, 1)
         y = np.asarray(y).reshape(-1, 1)
 
+        # scale for X
+        self.X_mean = np.mean(X, axis=0)
+        self.X_std = np.std(X, axis=0)
+        X = (X - self.X_mean) / (self.X_std + 1e-8)
+
         self.m, self.n = X.shape
         # initial sampling
         # the weights of the model
@@ -42,18 +47,15 @@ class LinearRegression:
 
         # partial gradients
         # matrix
-        def dJ_over_dw(w, b):
-            error = X @ w + b - y
+        def dJ_over_dw(error):
             return (1 / self.m) * (X.T @ error)
 
-        def dJ_over_db(w, b):
-            error = X @ w + b - y
+        def dJ_over_db(error):
             return (1 / self.m) * np.sum(error)
 
         # loss function (MSE)
         # matrix because of the number of data points
-        def J(w, b):
-            error = X @ w + b * np.ones((self.m, 1)) - y
+        def J(error):
             return float((error.T @ error) / (2 * self.m))
 
         previous_loss = float("inf")
@@ -61,14 +63,15 @@ class LinearRegression:
         # the traning process using gradient descent
         # to find the parameters that make the J min
         for i in range(self.epochs):
+            current_error = X @ self.w + self.b * np.ones((self.m, 1)) - y
             # forward pass
-            j = J(w=self.w, b=self.b)
+            j = J(current_error)
             # print("-Loss function: ", j)
             self.loss_history.append(j)
 
             # backward pass
-            rate_of_change_J_w = dJ_over_dw(self.w, self.b)
-            rate_of_change_J_b = dJ_over_db(self.w, self.b)
+            rate_of_change_J_w = dJ_over_dw(current_error)
+            rate_of_change_J_b = dJ_over_db(current_error)
 
             # update parameters
             self.w = self.w - self.learning_rate * rate_of_change_J_w
@@ -88,6 +91,10 @@ class LinearRegression:
         if X.ndim == 1:
             X = X.reshape(-1, 1)
         a, _ = X.shape
+
+        # scale X
+        X = (X - self.X_mean) / (self.X_std + 1e-8)
+
         return X @ self.w + self.b * np.ones((a, 1))
 
     def parameters(self):
@@ -110,12 +117,12 @@ class LinearRegression:
         plt.show()
 
     def score(self, X, y):
-        None
-
-    # def J(self, w, b):
-    #     a = (self.X @ w + b * np.ones((self.m, 1)) - y).T
-    #     b = self.X @ w + b * np.ones((self.m, 1)) - y
-    #     return (1 / (2 * self.m)) * (a @ b)
+        y = np.asarray(y).reshape(-1, 1)
+        y_pred = self.predict(X)
+        ss_total = np.sum((y - np.mean(y)) ** 2)
+        ss_residual = np.sum((y - y_pred) ** 2)
+        r2 = 1 - (ss_residual / ss_total)
+        return r2
 
     def info(self):
         print("- Training samples: ", self.m)
