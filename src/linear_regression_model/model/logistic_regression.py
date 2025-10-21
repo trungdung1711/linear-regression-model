@@ -119,9 +119,20 @@ class LogisticRegression:
 
         plt.show()
 
-    def score(self, X, y):
-        None
-
     def info(self):
         print("- Training samples: ", self.m)
         print("- Number of features: ", self.n)
+
+    def get_params(self, deep=True):
+        return {
+            "learning_rate": self.learning_rate,
+            "epochs": self.epochs,
+            "method": self.method,
+            "tol": self.tol,
+        }
+
+    def set_params(self, **params):
+        for key, value in params.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        return self

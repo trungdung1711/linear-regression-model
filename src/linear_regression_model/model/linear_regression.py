@@ -56,7 +56,7 @@ class LinearRegression:
         # loss function (MSE)
         # matrix because of the number of data points
         def J(error):
-            return float((error.T @ error) / (2 * self.m))
+            return np.sum(error**2) / (2 * self.m)
 
         previous_loss = float("inf")
 
@@ -127,3 +127,17 @@ class LinearRegression:
     def info(self):
         print("- Training samples: ", self.m)
         print("- Number of features: ", self.n)
+
+    def get_params(self, deep=True):
+        return {
+            "learning_rate": self.learning_rate,
+            "epochs": self.epochs,
+            "method": self.method,
+            "tol": self.tol,
+        }
+
+    def set_params(self, **params):
+        for key, value in params.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        return self
